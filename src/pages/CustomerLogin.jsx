@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './style.css';
 
-const AdminLogin = () => {
+const CustomerLogin = () => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: '',
     password: '',
@@ -17,18 +19,40 @@ const AdminLogin = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log('Admin Login submitted:', formData);
-    alert('Admin login submitted successfully!');
-    setFormData({
-      username: '',
-      password: '',
-    });
+    
+    const registrations = JSON.parse(localStorage.getItem('customerRegistrations')) || [];
+    
+    const customer = registrations.find(
+      (reg) => reg.username === formData.username && reg.password === formData.password
+    );
+    
+    if (customer) 
+    {
+      sessionStorage.setItem('isCustomer', 'true');
+      alert(`Login successful! Welcome, ${customer.fullName}!`);
+      console.log('Login successful:', customer);
+      setFormData({
+        username: '',
+        password: '',
+      });
+      navigate('/');
+      window.location.reload();
+    } 
+    else 
+      {
+      alert('Invalid username or password. Please try again.');
+      console.log('Login failed: Invalid credentials');
+      setFormData({
+        username: '',
+        password: '',
+      });
+    }
   };
 
   return (
     <div className="login-container">
       <div className="login-card">
-        <h1>Admin Login</h1>
+        <h1>Customer Login</h1>
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
             <label htmlFor="username">Username *</label>
@@ -63,4 +87,4 @@ const AdminLogin = () => {
   );
 };
 
-export default AdminLogin;
+export default CustomerLogin;
